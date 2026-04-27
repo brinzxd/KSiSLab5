@@ -6,6 +6,7 @@ import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
@@ -53,15 +54,10 @@ public class StorageService {
                 .body(resource);
     }
 
-    public ResponseEntity<Void> store(Path target, byte[] data) throws IOException {
-        if (data == null)
-            return ResponseEntity.badRequest().build();
+    public ResponseEntity<Void> store(Path target, InputStream data) throws IOException {
         boolean existed = Files.exists(target);
         Files.createDirectories(target.getParent());
-        Files.write(target, data,
-                StandardOpenOption.CREATE,
-                StandardOpenOption.TRUNCATE_EXISTING,
-                StandardOpenOption.WRITE);
+        Files.copy(data, target, StandardCopyOption.REPLACE_EXISTING);
         return ResponseEntity.status(existed ? HttpStatus.OK : HttpStatus.CREATED).build();
     }
 

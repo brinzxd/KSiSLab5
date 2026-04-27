@@ -43,7 +43,6 @@ public class StorageController {
     @PutMapping
     public ResponseEntity<?> put(
             @RequestHeader(value = "X-Copy-From", required = false) String copyFrom,
-            @RequestBody(required = false) byte[] body,
             HttpServletRequest request
     ) throws IOException {
         Path target = storageService.resolve(request.getRequestURI());
@@ -51,7 +50,7 @@ public class StorageController {
         if (copyFrom != null && !copyFrom.isBlank())
             return storageService.copy(storageService.resolve(copyFrom), target);
 
-        return storageService.store(target, body);
+        return storageService.store(target, request.getInputStream());
     }
 
     @RequestMapping(method = RequestMethod.HEAD)
